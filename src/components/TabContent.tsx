@@ -16,7 +16,7 @@ const Content: React.FC = () => {
     }
     // TODO - CSS STYLE VVV
     return( 
-        <div style={{height: "90vh", width: "100%", boxSizing: "border-box", overflow: "hidden"}}> 
+        <div style={{height: "calc(100vh - 43px)", width: "100vw", boxSizing: "border-box", overflow: "hidden"}}> 
             { content_displayed }
         </div>  
     )

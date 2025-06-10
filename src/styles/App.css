@@ -146,3 +146,9 @@ body, main {
   margin: 0;
   padding: 0;
 }
+
+.ant-tabs-nav-add {
+  background-color: red;
+}
+
+/* #086f79 <-- PROMESS COLOR*/
