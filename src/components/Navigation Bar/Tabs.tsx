@@ -1,11 +1,12 @@
-import React, { useRef, useState } from 'react';
-import Content from "./TabContent";
-import { Tabs, ConfigProvider } from 'antd';
-import antdThemeConfig from "../config/themeConfig"
+import React, { useEffect, useRef, useState } from 'react';
+import Content from "../Tab Content/TabContent";
+import { Tabs, ConfigProvider, Button } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
+import antdThemeConfig from "../../config/themeConfig"
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
 const initialItems = [
-  { label: 'New Tab', children: <Content/>, key: '1' }
+  { label: 'New Tab', children: <Content/>, key: '2' }
 ];
 
 const App: React.FC = () => {
@@ -13,10 +14,16 @@ const App: React.FC = () => {
   const [items, setItems] = useState(initialItems);
   const newTabIndex = useRef(0);
 
+  useEffect(() => {
+    const navWrap = document.querySelector('.ant-tabs-nav-wrap');
+    if (navWrap) {
+      navWrap.setAttribute('data-tauri-drag-region', '');
+    }
+  }, []);
+
   const onChange = (newActiveKey: string) => {
     setActiveKey(newActiveKey);
   };
-
   const add = () => {
     const newActiveKey = `newTab${newTabIndex.current++}`;
     const newPanes = [...items];
@@ -24,7 +31,6 @@ const App: React.FC = () => {
     setItems(newPanes);
     setActiveKey(newActiveKey);
   };
-
   const remove = (targetKey: TargetKey) => {
     let newActiveKey = activeKey;
     let lastIndex = -1;
@@ -44,7 +50,6 @@ const App: React.FC = () => {
     setItems(newPanes);
     setActiveKey(newActiveKey);
   };
-
   const onEdit = (
     targetKey: React.MouseEvent | React.KeyboardEvent | string,
     action: 'add' | 'remove',
@@ -63,10 +68,22 @@ const App: React.FC = () => {
           activeKey={activeKey}
           onEdit={onEdit}
           items={items}
-          centered
+          // centered
           size={"small"}
           animated
           className="navigation-tabs"
+          tabBarExtraContent={{
+            left: (
+              <div style={{marginRight: "15px", marginLeft: "10px"}}>
+                <SettingOutlined onClick={() => {console.log("bruhhhh")}}/>
+                
+              </div>
+            ),
+            right: (
+              <div>
+              </div>
+            ),
+  }}
         />
     </ConfigProvider>
   );

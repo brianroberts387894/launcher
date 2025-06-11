@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { SearchPage, MainWindow } from "./ContentDisplayed"
-import { TabType } from "../types/TabContentTypes"
+import { TabType } from "../../types/TabContentTypes"
 
 const Content: React.FC = () => {
     const [contentState, setContentState] = useState(TabType.SEARCH_PAGE);

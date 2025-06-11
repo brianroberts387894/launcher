@@ -5,25 +5,27 @@ const antdThemeConfig: ThemeConfig = {
   components: {
     Tabs: {
       margin: 0,
-      colorBorderSecondary: "rgb(126, 126, 126)",
-      colorFillAlter: "rgb(126, 126, 126)",
-      colorBgContainer: "rgb(47, 47, 47)",
+      cardHeightSM: 25,
+      horizontalMargin: 	"0px 150px 0px 5px",
+      colorBorderSecondary: "rgba(255, 255, 255, 0)",
       itemColor: "rgb(224, 224, 224)",
+      colorFillAlter: "rgb(43, 43, 43)",
+      colorBgContainer: "#555555",
       itemSelectedColor: "rgb(255, 255, 255)",
-      itemHoverColor: "rgb(255, 255, 255)",
       itemActiveColor: "rgb(126, 126, 126)",
+      itemHoverColor: "rgb(255, 255, 255)",
     },
     Input: {
-      activeBorderColor: "rgb(11, 148, 141)",
-      hoverBorderColor: "rgb(17, 177, 150)",
-      colorPrimaryActive: "rgb(11, 148, 141)",
-      colorPrimaryHover: "rgb(11, 148, 141)",
-      colorBorderSecondary: "rgb(11, 148, 141)",
+      activeBorderColor: "#47979E",
+      hoverBorderColor: "#47979E",
+      colorPrimaryActive: "#47979E",
+      colorPrimaryHover: "#47979E",
+      colorBorderSecondary: "#47979E",
       borderRadiusLG: 17,
     },
     Button: {
-      colorPrimary: "rgb(17, 177, 150)",
-      colorBgContainer: "rgb(17, 177, 150)",
+      colorPrimary: "#47979E",
+      colorBgContainer: "#47979E",
       colorPrimaryHover: "rgb(176, 255, 242)",
       colorPrimaryActive: "rgb(217, 255, 249)",
       fontWeight: 700,
@@ -31,9 +33,9 @@ const antdThemeConfig: ThemeConfig = {
     },
     Spin: {
       dotSizeLG: 200,
-      colorPrimary: "rgb(10, 128, 122)",
+      colorPrimary: "rgb(14, 209, 199)",
       colorBgMask: "rgba(47, 47, 47, 0.79)",
-      colorBgContainer: "rgb(47, 47, 47)",
+      colorBgContainer: "#555555",
     }
   }
 };

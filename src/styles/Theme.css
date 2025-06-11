@@ -1,0 +1,12 @@
+:root {
+  --promess-lightblue: #47979E;
+  --promess-grey: #555555;
+  --ultrapro-background: rgb(43, 43, 43);
+  
+  --tabTitleBar-marginTop: 5px;
+  --tabTitleBar-marginLeft: 5px;
+  --tabTitleBar-marginRight: 5px;
+  --tabTitleBar-buttonSafeAreaLength: 150px;
+}
+
+/* TODO - DELETE */

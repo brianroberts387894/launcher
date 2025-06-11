@@ -10,18 +10,23 @@ body, main {
 }
 
 .content-tab-container{
-    height: calc(100vh - 43px);
-    width: 100vw;
-    overflow: hidden;
+  padding-top: 0px;
+  height: calc(100vh - 42px);
+  width: 100vw;
+  overflow: hidden;
+  background-color: #555555;
 }
 
 .content-iframe{
     width: 100vw; 
-    height: calc(100vh - 43px);
+    height: calc(100vh - 42px);
     border: 0px;
     margin-top: 0px;
     user-select: none;
     overflow: hidden;
+}
+iframe:focus {
+  outline: none;
 }
 
 .content-search-program{
@@ -40,10 +45,24 @@ body, main {
     margin-top: 5px;
 }
 
+main{
+  background-color: #1d1d1d !important;
+}
+/* ANTD COMPONENT OVERRIDE */
+
+.ant-tabs-nav-add{
+  background-color: rgb(43, 43, 43) !important;
+}
+
 /* --- CUSTOM TITLEBAR CSS --- */
+
+.promessicon{
+  height: 20px;
+}
+
 .titlebar {
-  height: 30px;
-  background: #329ea3;
+  height: 40px;
+  background: #1f1f1f00;
   user-select: none;
   display: flex;
   justify-content: flex-end;
@@ -52,6 +71,7 @@ body, main {
   left: 0;
   right: 0;
 }
+
 .titlebar-button {
   display: inline-flex;
   justify-content: center;
@@ -61,8 +81,10 @@ body, main {
   user-select: none;
   -webkit-user-select: none;
 }
+
 .titlebar-button:hover {
-  background: #5bbec3;
+  background: #47979E;
 }
 
-/* #086f79 <-- PROMESS COLOR*/
+/* #086f79 */
+/* #47979E */

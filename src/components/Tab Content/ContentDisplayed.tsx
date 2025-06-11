@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Input, Spin, Button } from 'antd';
-import { LoadingOutlined, LinkOutlined } from '@ant-design/icons';;
-import { TabType } from "../types/TabContentTypes"
+import { LoadingOutlined, LinkOutlined, SyncOutlined } from '@ant-design/icons';
+import { TabType } from "../../types/TabContentTypes";
 
 // SEARCH PROGRAM VIEW (OPENS ON NEW TAB) //
 
@@ -27,6 +27,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarg
             placeholder="Enter Program IP Address or Localhost Port" 
             variant="filled"
             onChange={handleInputChange}
+            onPressEnter={() => handleSubmission(inputValue)}
           />
           <div className="content-search-program-button-container">
             <Button 
@@ -50,7 +51,7 @@ export const MainWindow: React.FC<ContentPageProps> = ({ target }) => {
     const [loading, setLoading]= useState(true);
     return(
         <Spin 
-          indicator={<LoadingOutlined spin />} 
+          indicator={<LoadingOutlined spin/>} 
           spinning={loading} 
           size="large"
         >
