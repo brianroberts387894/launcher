@@ -1,0 +1,68 @@
+/* --- FIXES FOR MAIN --- */
+body, main {
+  margin: 0;
+  padding: 0;
+}
+
+.navigation-tabs{
+    margin-bottom: 0px;
+    height: 95%;
+}
+
+.content-tab-container{
+    height: calc(100vh - 43px);
+    width: 100vw;
+    overflow: hidden;
+}
+
+.content-iframe{
+    width: 100vw; 
+    height: calc(100vh - 43px);
+    border: 0px;
+    margin-top: 0px;
+    user-select: none;
+    overflow: hidden;
+}
+
+.content-search-program{
+    width: 50%;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto; 
+    margin-top: 150px;
+}
+
+.content-search-program-button-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 5px;
+}
+
+/* --- CUSTOM TITLEBAR CSS --- */
+.titlebar {
+  height: 30px;
+  background: #329ea3;
+  user-select: none;
+  display: flex;
+  justify-content: flex-end;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.titlebar-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.titlebar-button:hover {
+  background: #5bbec3;
+}
+
+/* #086f79 <-- PROMESS COLOR*/

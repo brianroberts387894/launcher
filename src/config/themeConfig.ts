@@ -1,8 +1,7 @@
-import { Tabs, ConfigProvider, theme } from 'antd';
+import { ThemeConfig, theme } from 'antd';
 
-// TODO: stupid type casting
-const themeConfig = {
-  algorithm: 'dark',
+const antdThemeConfig: ThemeConfig = {
+  algorithm: theme.darkAlgorithm,
   components: {
     Tabs: {
       margin: 0,
@@ -39,4 +38,4 @@ const themeConfig = {
   }
 };
 
-export default themeConfig;
+export default antdThemeConfig;

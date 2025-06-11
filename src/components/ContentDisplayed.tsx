@@ -1,10 +1,9 @@
-import React, { useRef, useState } from 'react';
-import { Tabs, Input, Flex, Spin, ConfigProvider, theme, Button } from 'antd';
+import React, { useState } from 'react';
+import { Input, Spin, Button } from 'antd';
+import { LoadingOutlined, LinkOutlined } from '@ant-design/icons';;
 import { TabType } from "../types/TabContentTypes"
-import { LoadingOutlined } from '@ant-design/icons';
-import { LinkOutlined } from '@ant-design/icons';
 
-// OPENS ON NEW TAB //
+// SEARCH PROGRAM VIEW (OPENS ON NEW TAB) //
 
 interface SearchPageProps {
   setContentState: React.Dispatch<React.SetStateAction<TabType>>;
@@ -21,13 +20,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarg
     setContentState(TabType.MAIN_WINDOW);
   }  
   return(
-      <div style={{
-      width: "50%",
-      justifyContent: "center", 
-      alignItems: "center", 
-      margin: "0 auto", 
-      marginTop: "150px"}}
-    >
+      <div className="content-search-program">
           <h1>UltraPro 2 Launcher</h1>
           <Input
             size="large" 
@@ -35,14 +28,14 @@ export const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarg
             variant="filled"
             onChange={handleInputChange}
           />
-          <div style={{
-            display: "flex",
-            justifyContent: "center", 
-            alignItems: "center", 
-            margin: "0 auto", 
-            marginTop: "5px"}}
-          >
-            <Button size="middle" variant="solid" icon={<LinkOutlined />}onClick={() => handleSubmission(inputValue)}>Link to Program</Button>
+          <div className="content-search-program-button-container">
+            <Button 
+              size="middle" 
+              variant="solid" 
+              icon={<LinkOutlined />}
+              onClick={() => handleSubmission(inputValue)}>
+                Link to Program
+            </Button>
           </div>
     </div>
   )
@@ -54,23 +47,19 @@ interface ContentPageProps {
   target: string
 }
 export const MainWindow: React.FC<ContentPageProps> = ({ target }) => {
-    // TODO - CSS STYLE VVV
     const [loading, setLoading]= useState(true);
     return(
-        <Spin indicator={<LoadingOutlined spin />} spinning={loading} size="large">
+        <Spin 
+          indicator={<LoadingOutlined spin />} 
+          spinning={loading} 
+          size="large"
+        >
           <iframe 
             src={ target } 
             title="description"
             onLoad={() => setLoading(false)}
-            style={{
-              width: "100vw", 
-              height: "calc(100vh - 43px)", 
-              border:"0px", 
-              marginTop: "0px", 
-              userSelect: "none", 
-              overflow: "hidden"
-            }}>
-          </iframe>
+            className="content-iframe"
+          />
         </Spin>
     )
 }

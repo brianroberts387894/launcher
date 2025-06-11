@@ -14,9 +14,8 @@ const Content: React.FC = () => {
             content_displayed = <MainWindow target={target}/>;
             break;
     }
-    // TODO - CSS STYLE VVV
     return( 
-        <div style={{height: "calc(100vh - 43px)", width: "100vw", boxSizing: "border-box", overflow: "hidden"}}> 
+        <div className="content-tab-container" > 
             { content_displayed }
         </div>  
     )
