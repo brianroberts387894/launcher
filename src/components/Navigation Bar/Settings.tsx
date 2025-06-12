@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Button, Modal, ConfigProvider } from 'antd';
+import {  Modal } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
-import { searchButtonTheme } from '../../config/themeConfig';
+// import { Button, ConfigProvider } from 'antd';
+// import { searchButtonTheme } from '../../config/themeConfig';
+
 const Settings: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     
     const showModal = () => {
-        setIsModalOpen(true);
+        // setIsModalOpen(true); TODO -> Disabled
     };
     const handleOk = () => {
         setIsModalOpen(false);

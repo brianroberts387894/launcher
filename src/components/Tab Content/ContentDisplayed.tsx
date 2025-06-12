@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Input, Spin, Button, ConfigProvider } from 'antd';
-import { LoadingOutlined, LinkOutlined, SyncOutlined } from '@ant-design/icons';
+import { Input, Spin, Button, ConfigProvider, message } from 'antd';
+import { LoadingOutlined, LinkOutlined } from '@ant-design/icons';
 import { TabType } from "../../types/TabContentTypes";
 import { searchButtonTheme } from "../../config/themeConfig"
 // SEARCH PROGRAM VIEW (OPENS ON NEW TAB) //
@@ -14,7 +14,16 @@ export const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarg
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
-  const handleSubmission = (inputValue: string) => {    
+  const handleSubmission = (inputValue: string) => {
+    const isValidUrl = /^https?:\/\//i.test(inputValue);
+
+    if (!isValidUrl) {
+      message.open({
+        type: 'error',
+        content: 'Invalid URL',
+      });
+      return;
+    }    
     setTarget(inputValue);
     setContentState(TabType.MAIN_WINDOW);
   }  
@@ -61,6 +70,7 @@ export const MainWindow: React.FC<ContentPageProps> = ({ target }) => {
             src={ target } 
             title="description"
             onLoad={() => setLoading(false)}
+
             className="content-iframe"
           />
         </Spin>

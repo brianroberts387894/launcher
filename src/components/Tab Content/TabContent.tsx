@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { SearchPage, MainWindow } from "./ContentDisplayed"
 import { TabType } from "../../types/TabContentTypes"
 
