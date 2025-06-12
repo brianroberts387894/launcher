@@ -1,11 +1,18 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { MinusOutlined, BorderOutlined, CloseOutlined, CompressOutlined } from '@ant-design/icons';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 
-const appWindow = getCurrentWindow();
-
 const TitleBarElement = () => {
     const [expandedState, setExpandedState] = useState<boolean>(false)
+
+    useEffect(() => {
+        const appWindow = getCurrentWindow();
+        const checkMaximized = async () => {
+            const isMaximized = await appWindow.isMaximized();
+            isMaximized ? setExpandedState(true) : setExpandedState(false);
+        }; 
+        appWindow.onResized(() => {checkMaximized();});
+    }, []);
 
     const handleMinimize = async () => {
         const appWindow = getCurrentWindow();

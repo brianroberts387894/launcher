@@ -25,12 +25,13 @@ body, main {
     user-select: none;
     overflow: hidden;
 }
+
 iframe:focus {
   outline: none;
 }
 
 .content-search-program{
-    width: 50%;
+    width: 500px;
     justify-content: center;
     align-items: center;
     margin: 0 auto; 
@@ -42,13 +43,14 @@ iframe:focus {
     justify-content: center;
     align-items: center;
     margin: 0 auto;
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
 main{
   background-color: #1d1d1d !important;
 }
-/* ANTD COMPONENT OVERRIDE */
+
+/* --- ANTD COMPONENT OVERRIDE --- */
 
 .ant-tabs-nav-add{
   background-color: rgb(43, 43, 43) !important;

@@ -1,6 +1,5 @@
-import Tab from './components/Navigation Bar/Tabs'
+import Tab from './components/Navigation Bar/NavCards'
 import TitleBarElement from "./components/Title Bar/TitleBar"
-import DragTabs from "./components/Navigation Bar/DraggableTabs"
 import "./styles/App.css";
 import "./styles/Custom.css";
 

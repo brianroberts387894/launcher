@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Content from "../Tab Content/TabContent";
-import { Tabs, ConfigProvider, Button } from 'antd';
-import { SettingOutlined } from '@ant-design/icons';
-import antdThemeConfig from "../../config/themeConfig"
+import Settings from "../Navigation Bar/Settings"
+import { Tabs, ConfigProvider } from 'antd';
+
+import { antdThemeConfig } from "../../config/themeConfig"
+import { getCurrentWindow } from '@tauri-apps/api/window';
+
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
 const initialItems = [
@@ -20,7 +23,13 @@ const App: React.FC = () => {
       navWrap.setAttribute('data-tauri-drag-region', '');
     }
   }, []);
-
+  useEffect(() => {
+    if(items.length == 0){
+      const appWindow = getCurrentWindow();
+      appWindow.close();
+    };
+  });
+  
   const onChange = (newActiveKey: string) => {
     setActiveKey(newActiveKey);
   };
@@ -60,6 +69,7 @@ const App: React.FC = () => {
       remove(targetKey);
     }
   };
+  
   return (
     <ConfigProvider theme={ antdThemeConfig }>
         <Tabs
@@ -68,22 +78,20 @@ const App: React.FC = () => {
           activeKey={activeKey}
           onEdit={onEdit}
           items={items}
-          // centered
           size={"small"}
           animated
           className="navigation-tabs"
           tabBarExtraContent={{
             left: (
               <div style={{marginRight: "15px", marginLeft: "10px"}}>
-                <SettingOutlined onClick={() => {console.log("bruhhhh")}}/>
-                
+                <Settings/>
               </div>
             ),
             right: (
               <div>
               </div>
             ),
-  }}
+          }}
         />
     </ConfigProvider>
   );

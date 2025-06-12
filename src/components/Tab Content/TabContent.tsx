@@ -5,6 +5,7 @@ import { TabType } from "../../types/TabContentTypes"
 const Content: React.FC = () => {
     const [contentState, setContentState] = useState(TabType.SEARCH_PAGE);
     const [target, setTarget] = useState("");
+
     let content_displayed;
     switch(contentState){
         case TabType.SEARCH_PAGE:
@@ -14,6 +15,7 @@ const Content: React.FC = () => {
             content_displayed = <MainWindow target={target}/>;
             break;
     }
+    
     return( 
         <div className="content-tab-container" > 
             { content_displayed }

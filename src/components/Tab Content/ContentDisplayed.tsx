@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Input, Spin, Button } from 'antd';
+import { Input, Spin, Button, ConfigProvider } from 'antd';
 import { LoadingOutlined, LinkOutlined, SyncOutlined } from '@ant-design/icons';
 import { TabType } from "../../types/TabContentTypes";
-
+import { searchButtonTheme } from "../../config/themeConfig"
 // SEARCH PROGRAM VIEW (OPENS ON NEW TAB) //
 
 interface SearchPageProps {
@@ -15,30 +15,31 @@ export const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarg
     setInputValue(e.target.value);
   };
   const handleSubmission = (inputValue: string) => {    
-    console.log(inputValue);
     setTarget(inputValue);
     setContentState(TabType.MAIN_WINDOW);
   }  
+
   return(
+    <ConfigProvider theme={searchButtonTheme}>
       <div className="content-search-program">
-          <h1>UltraPro 2 Launcher</h1>
-          <Input
-            size="large" 
-            placeholder="Enter Program IP Address or Localhost Port" 
-            variant="filled"
-            onChange={handleInputChange}
-            onPressEnter={() => handleSubmission(inputValue)}
-          />
-          <div className="content-search-program-button-container">
-            <Button 
-              size="middle" 
-              variant="solid" 
-              icon={<LinkOutlined />}
-              onClick={() => handleSubmission(inputValue)}>
-                Link to Program
-            </Button>
-          </div>
-    </div>
+        <h1>UltraPro 2 Launcher</h1>
+        <Input
+          size="large" 
+          placeholder="Enter Program IP Address or Localhost Port" 
+          onChange={handleInputChange}
+          onPressEnter={() => handleSubmission(inputValue)}
+        />
+        <div className="content-search-program-button-container">
+          <Button 
+            size="middle" 
+            variant="solid" 
+            icon={<LinkOutlined />}
+            onClick={() => handleSubmission(inputValue)}>
+              Link to Program
+          </Button>
+        </div>
+      </div>
+    </ConfigProvider>
   )
 }
 
@@ -49,6 +50,7 @@ interface ContentPageProps {
 }
 export const MainWindow: React.FC<ContentPageProps> = ({ target }) => {
     const [loading, setLoading]= useState(true);
+    
     return(
         <Spin 
           indicator={<LoadingOutlined spin/>} 
@@ -64,4 +66,5 @@ export const MainWindow: React.FC<ContentPageProps> = ({ target }) => {
         </Spin>
     )
 }
+
 
