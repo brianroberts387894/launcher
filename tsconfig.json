@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "../trash/DRAG_TEST.tsx", "../trash/NavCards.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

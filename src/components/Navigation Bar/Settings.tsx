@@ -8,7 +8,7 @@ const Settings: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     
     const showModal = () => {
-        // setIsModalOpen(true); TODO -> Disabled
+        setIsModalOpen(true);
     };
     const handleOk = () => {
         setIsModalOpen(false);

@@ -19,7 +19,8 @@
         "height": 800,
         "fullscreen": false,
         "theme": "Dark",
-        "decorations": false
+        "decorations": false,
+        "dragDropEnabled": false
       }
     ],
     "security": {
