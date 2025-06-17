@@ -8,19 +8,22 @@ import invariant from "tiny-invariant";
 import { draggable, dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { DragContext } from './NavigationBar';
 
-type DraggableWrapperProps = {
+
+
+// Draggable Tab Card //
+
+type DraggableTabProps = {
+    node: React.ReactElement<any, string | React.JSXElementConstructor<any>>,
     children: any
-}
-function DraggableWrapper({children}: DraggableWrapperProps){
+};
+function DraggableTab({node, children}: DraggableTabProps){
     const ref = useRef(null);
     const DragState = useContext(DragContext);
 
     function handleDragStart(){
-        console.log("Drag Start"); 
         DragState.setIsDraggingTab(true);
     }
     function handleLetGo(){
-        console.log("Drag Let Go"); 
         DragState.setIsDraggingTab(false);
     }
 
@@ -29,8 +32,9 @@ function DraggableWrapper({children}: DraggableWrapperProps){
         invariant(el);
         return draggable({
             element: el,
+            getInitialData: () => ({ key: node.key, typeOf: "drag"}),
             onDragStart: () => handleDragStart(),
-            onDrop: () => handleLetGo()
+            onDrop: () => handleLetGo(),
         });
     }, []);
 
@@ -39,30 +43,58 @@ function DraggableWrapper({children}: DraggableWrapperProps){
             {children}
         </div>
     );
-}
+};
 
+// Tab Card Dropping Points //
 
+function HighlightBar(isRightSide: boolean){
+    if(isRightSide == false){
+        return(
+            <div style={{
+                height: "33px",
+                width: "2px",
+                backgroundColor: "white"}}
+            />);
+    }
+    return(
+        <div style={{
+            height: "33px",
+            width: "2px",
+            backgroundColor: "white",
+            marginLeft: "100%"}}
+        />
+    );
+};
 type DroppableWrapperProps = {
-    children: any | undefined
-    Style: any
-}
-function DroppableWrapper({children, Style}: DroppableWrapperProps){
-
+    isRightSide: boolean,
+    PointerState: string,
+    node: React.ReactElement<any, string | React.JSXElementConstructor<any>>,
+};
+function DroppableTabSide({isRightSide, PointerState, node}: DroppableWrapperProps){
+    const StyleLeft: React.CSSProperties = {
+        width: "50%",
+        height: "100%",
+        pointerEvents: PointerState as React.CSSProperties['pointerEvents'],
+        position: "absolute",
+        display: 'inline-block',
+        zIndex: 2
+    }
+    const StyleRight: React.CSSProperties = {
+        ...StyleLeft,
+        right: 0
+    }
     const ref = useRef(null);
     const [isDraggedOver, setIsDraggedOver] = useState(false);
 
+    
     function handleDragEnter(){
         setIsDraggedOver(true);
-        console.log("Drag Enter");
     }
-
     function handleDragLeave(){
         setIsDraggedOver(false);
-        console.log("Drag Leave");
     };
     function handleOnDrop(){
         setIsDraggedOver(false);
-        console.log("Dropped");
     };
 
     useEffect(() => {
@@ -74,25 +106,25 @@ function DroppableWrapper({children, Style}: DroppableWrapperProps){
             onDragEnter: () => handleDragEnter(),
             onDragLeave: () => handleDragLeave(),
             onDrop: () => handleOnDrop(),
+            getData: () => ({key: node.key, isRightSide: isRightSide, typeOf: "drop_tab"}),
         });
     }, []);
 
     return(
-        <div ref={ref} style={Style}>
-            {children}
+        <div ref={ref} style={isRightSide ? StyleRight : StyleLeft}>
+            {isDraggedOver ? HighlightBar(isRightSide) :  <></>}
         </div>
     );
-}
+};
 
-function HighlightBar(){
-    return(<h1>Hello</h1>);
-}
+// Complete Package //
 
 type TabCardProps = {
-    onChange: (key: string) => void;
-    node: React.ReactElement<any, string | React.JSXElementConstructor<any>>
+    node: React.ReactElement<any, string | React.JSXElementConstructor<any>>,
+    onChange: (newActiveKey: string) => void
+    [key: string]: any
 };
-function TabCard({ onChange, node }: TabCardProps){
+function TabCard({ onChange, node, ...tabBarProps }: TabCardProps){
     const [pointerState, setPointerState] = useState<string>("none");
     const DragState = useContext(DragContext);
         
@@ -102,32 +134,27 @@ function TabCard({ onChange, node }: TabCardProps){
 
     return(
         <div style={{display: "flex", position: "relative"}}>
-            <DroppableWrapper Style={{
-                                backgroundColor: "rgba(255, 1, 1, 0.27)", 
-                                width: "50%", height: "100%", pointerEvents: pointerState, 
-                                position: "absolute", display: 'inline-block' , zIndex: 2
-                            }}
-            >
-                <></>
-            </DroppableWrapper>
-            <DraggableWrapper>
-                <Button style={{marginLeft: "0px", zIndex: "1"}} onClick={() => {onChange(node.key as string)}}>*Tab Name*</Button>
-            </DraggableWrapper>
-                        <DroppableWrapper Style={{
-                                backgroundColor: "rgba(0, 38, 255, 0.27)", 
-                                width: "50%", height: "100%",
-                                position: "absolute", display: 'inline-block', pointerEvents: pointerState, 
-                                right: 0, zIndex: 2
-                            }}
-            >
-                <></>
-            </DroppableWrapper>
+            <DroppableTabSide 
+                node={node}
+                isRightSide={false}
+                PointerState={pointerState}
+            />
+            <DraggableTab node={node}>
+                <Button 
+                    style={{marginLeft: "0px", zIndex: "1"}} 
+                    onClick={() => {onChange(node.key as string)}}
+                >
+                    {node.key}
+                </Button>
+            </DraggableTab>
+
+            <DroppableTabSide 
+                node={node}
+                isRightSide={true}
+                PointerState={pointerState}
+            />
         </div>
     );
-}
+};
 
 export default TabCard;
-
-
-
-

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Input, Spin, Button, ConfigProvider, message } from 'antd';
 import { LoadingOutlined, LinkOutlined } from '@ant-design/icons';
 import { TabType } from "../../types/TabContentTypes";
@@ -76,5 +76,3 @@ export const MainWindow: React.FC<ContentPageProps> = ({ target }) => {
         </Spin>
     )
 }
-
-

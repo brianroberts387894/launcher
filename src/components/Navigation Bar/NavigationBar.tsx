@@ -6,26 +6,35 @@ import { Tabs, ConfigProvider } from 'antd';
 import { antdThemeConfig } from "../../config/themeConfig"
 import { getCurrentWindow } from '@tauri-apps/api/window';
 
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
 const initialItems = [
-  { label: 'New Tab', children: <Content/>, key: '0' }
+    { label: 'Silly Tab', children: <Content/>, key: 'tabNumber-1' },
 ];
 
-export const DragContext = createContext<{
-                                isDraggingTab: boolean; 
-                                setIsDraggingTab: React.Dispatch<React.SetStateAction<boolean>>;}
-                                        >({
-    isDraggingTab: false, setIsDraggingTab: () => {}
+interface DragContextType {
+    isDraggingTab: boolean;
+    setIsDraggingTab: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export const DragContext = createContext<DragContextType>({
+    isDraggingTab: false,
+    setIsDraggingTab: () => {},
 });
 
 const App: React.FC = () => {
     const [activeKey, setActiveKey] = useState(initialItems[0].key);
     const [items, setItems] = useState(initialItems);
-    const newTabIndex = useRef(0);
-
+    const [tabCount, setTabCount] = useState<number>(1);
     const [isDraggingTab, setIsDraggingTab] = useState<boolean>(false);
-
+    const newTabIndex = useRef(0);
 
     // Allows the entire black bar at the top of the page to be dragged //
     useEffect(() => {
@@ -42,12 +51,28 @@ const App: React.FC = () => {
         appWindow.close();
         };
     });
+
+    // Monitor for DnD //
+    useEffect(() => {
+        return monitorForElements({
+            onDrop({ source, location }) {
+                if(location.current.dropTargets.length <= 0 || location.current.dropTargets[0].data["typeOf"] != "drop_tab"){
+                    return
+                }
+                const fromKey = source.data.key;
+                const toKey = location.current.dropTargets[0].data["key"];
+                const isRightSide = location.current.dropTargets[0].data["isRightSide"];
+                
+                swapTabs(toKey as string, fromKey  as string, isRightSide as boolean);
+            },
+        })
+    });
     
     const onChange = (newActiveKey: string) => {
         setActiveKey(newActiveKey);
     };
     const add = () => {
-        const newActiveKey = `newTab${newTabIndex.current++}`;
+        const newActiveKey = `tabNumber${newTabIndex.current++}`;
         const newPanes = [...items];
         newPanes.push({ label: 'New Tab', children: <Content/>, key: newActiveKey });
         setItems(newPanes);
@@ -82,6 +107,18 @@ const App: React.FC = () => {
         remove(targetKey);
         }
     };
+    function swapTabs(toKey: string, fromKey: string, isRightSide: boolean) {
+        const fromIndex = items.findIndex(item => item.key === fromKey);
+        const toIndex = items.findIndex(item => item.key === toKey);
+
+        if (fromIndex === -1 || toIndex === -1) {
+            console.log("error: element does not seem to exist when swapping tabs");
+            return;
+        }
+        setItems(arrayMove(items, fromIndex, toIndex));
+        console.log("huh")
+    }
+
 
     const tabBarExtraContent = {
         left: (
@@ -98,6 +135,7 @@ const App: React.FC = () => {
         <ConfigProvider theme={ antdThemeConfig }>
             <Tabs
                 type="editable-card"
+                destroyOnHidden={false} 
                 onChange={onChange}
                 activeKey={activeKey}
                 onEdit={onEdit}
@@ -111,8 +149,10 @@ const App: React.FC = () => {
                         {(node) => (
                             <DragContext.Provider value={{ isDraggingTab, setIsDraggingTab }}>
                             <TabCard 
-                                onChange={onChange} 
                                 node={node}
+                                swapTabs={swapTabs}
+                                onChange={onChange}
+                                {...tabBarProps}
                             />
                             </DragContext.Provider>
                         )}
