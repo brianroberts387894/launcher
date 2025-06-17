@@ -4,6 +4,7 @@ import Settings from "./Settings"
 import { Tabs, ConfigProvider, Button } from 'antd';
 import { antdThemeConfig } from "../../config/themeConfig"
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { MinusOutlined, BorderOutlined, CloseOutlined, CompressOutlined } from '@ant-design/icons';
 import invariant from "tiny-invariant";
 import { draggable, dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { DragContext } from './NavigationBar';
@@ -122,9 +123,10 @@ function DroppableTabSide({isRightSide, PointerState, node}: DroppableWrapperPro
 type TabCardProps = {
     node: React.ReactElement<any, string | React.JSXElementConstructor<any>>,
     onChange: (newActiveKey: string) => void
+    onEdit: (targetKey: React.MouseEvent | React.KeyboardEvent | string, action: "add" | "remove") => void,
     [key: string]: any
 };
-function TabCard({ onChange, node, ...tabBarProps }: TabCardProps){
+function TabCard({ onChange, onEdit, node, ...tabBarProps }: TabCardProps){
     const [pointerState, setPointerState] = useState<string>("none");
     const DragState = useContext(DragContext);
         
@@ -140,12 +142,20 @@ function TabCard({ onChange, node, ...tabBarProps }: TabCardProps){
                 PointerState={pointerState}
             />
             <DraggableTab node={node}>
-                <Button 
+                <div 
                     style={{marginLeft: "0px", zIndex: "1"}} 
-                    onClick={() => {onChange(node.key as string)}}
+                    onClick={(e) => {
+                        onChange(node.key as string)}
+                    }
                 >
                     {node.key}
-                </Button>
+                    <Button size={"small"} onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(node.key as string, "remove");
+                        
+                    }}><CloseOutlined/></Button>
+                    
+                </div>
             </DraggableTab>
 
             <DroppableTabSide 

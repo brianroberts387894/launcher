@@ -1,5 +1,5 @@
 export enum TabType {
   SEARCH_PAGE,
-  MAIN_WINDOW,
+  FRAME_WINDOW,
   OTHER,
 }

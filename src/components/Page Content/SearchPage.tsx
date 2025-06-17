@@ -9,7 +9,7 @@ interface SearchPageProps {
   setContentState: React.Dispatch<React.SetStateAction<TabType>>;
   setTarget: React.Dispatch<React.SetStateAction<string>>;
 }
-export const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarget }) => {
+const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarget }) => {
   const [inputValue, setInputValue] = useState("");
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -52,27 +52,29 @@ export const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarg
   )
 }
 
-// IFRAME CONTENT VIEW //
+export default SearchPage;
 
-interface ContentPageProps {
-  target: string
-}
-export const MainWindow: React.FC<ContentPageProps> = ({ target }) => {
-    const [loading, setLoading]= useState(true);
+// // IFRAME CONTENT VIEW //
+
+// interface ContentPageProps {
+//   target: string
+// }
+// export const MainWindow: React.FC<ContentPageProps> = ({ target }) => {
+//     const [loading, setLoading]= useState(true);
     
-    return(
-        <Spin 
-          indicator={<LoadingOutlined spin/>} 
-          spinning={loading} 
-          size="large"
-        >
-          <iframe 
-            src={ target } 
-            title="description"
-            onLoad={() => setLoading(false)}
+//     return(
+//         <Spin 
+//           indicator={<LoadingOutlined spin/>} 
+//           spinning={loading} 
+//           size="large"
+//         >
+//           <iframe 
+//             src={ target } 
+//             title="description"
+//             onLoad={() => setLoading(false)}
 
-            className="content-iframe"
-          />
-        </Spin>
-    )
-}
+//             className="content-iframe"
+//           />
+//         </Spin>
+//     )
+// }

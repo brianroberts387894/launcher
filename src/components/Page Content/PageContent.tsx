@@ -1,8 +1,10 @@
 import React, { useState, memo } from 'react';
-import { SearchPage, MainWindow } from "./ContentDisplayed"
+import SearchPage from "./SearchPage"
 import { TabType } from "../../types/TabContentTypes"
 
-const Content: React.FC = () => {
+interface ContentProps{
+}
+function Content({}: ContentProps){
     const [contentState, setContentState] = useState(TabType.SEARCH_PAGE);
     const [target, setTarget] = useState("");
 
@@ -12,7 +14,7 @@ const Content: React.FC = () => {
             content_displayed = <SearchPage setContentState={setContentState} setTarget={setTarget}/>;
             break;
         default:
-            content_displayed = <MainWindow target={target}/>;
+            content_displayed = <div/>
             break;
     }
     

@@ -1,25 +1,25 @@
-import React, { useEffect, useRef, useState, createContext } from 'react';
-import Content from "../Page Content/PageContent";
-import TabCard from "../Navigation Bar/Tab"
-import Settings from "./Settings"
+import React, { useEffect, useRef, useState, createContext, useReducer } from 'react';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { Tabs, ConfigProvider } from 'antd';
 import { antdThemeConfig } from "../../config/themeConfig"
-import { getCurrentWindow } from '@tauri-apps/api/window';
-
-import {
-  arrayMove,
-  horizontalListSortingStrategy,
-  SortableContext,
-  useSortable,
-} from '@dnd-kit/sortable';
+import Content from "../Page Content/PageContent";
+import GlobalFrameRenderer from "../Page Content/FrameRenderer";
+import TabCard from "../Navigation Bar/Tab"
+import Settings from "./Settings"
+import { TabType } from "../../types/TabContentTypes"
+import { arrayMove } from '@dnd-kit/sortable';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 
+
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
+type TabItem = {
+    label: string;
+    children: React.ReactNode;
+    key: string;
+    pageContext: any; // You can replace `any` with a more specific type if you know it
+};
 
-const initialItems = [
-    { label: 'Silly Tab', children: <Content/>, key: 'tabNumber-1' },
-];
-
+// TAB - IRREVELANT CONTEXT, MIGRATE TO TAB.TSX // 
 interface DragContextType {
     isDraggingTab: boolean;
     setIsDraggingTab: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,30 +30,110 @@ export const DragContext = createContext<DragContextType>({
 });
 
 const App: React.FC = () => {
-    const [activeKey, setActiveKey] = useState(initialItems[0].key);
-    const [items, setItems] = useState(initialItems);
-    const [tabCount, setTabCount] = useState<number>(1);
-    const [isDraggingTab, setIsDraggingTab] = useState<boolean>(false);
-    const newTabIndex = useRef(0);
 
-    // Allows the entire black bar at the top of the page to be dragged //
-    useEffect(() => {
+    // INITIAL //
+    const initialKey = 'tabNumber-1';
+    const initialPageContext = { 
+        type: TabType.SEARCH_PAGE, target: ""
+    };
+    const initialItems = [
+        { label: 'Silly Tab', children: <Content/>, key: initialKey, pageContext: initialPageContext},
+    ];
+
+    // State //
+    const [activeKey, setActiveKey] = useState(initialKey);
+    const newTabIndex = useRef(0);
+    const [isDraggingTab, setIsDraggingTab] = useState<boolean>(false);
+
+    // Controls Iframe View //
+    function framesReducer(prevState: any, action: any){
+        switch(action.type){
+            case "add": 
+                const newFramesAdd = [...prevState];
+                newFramesAdd.push("https://www.react.dev");
+                return(newFramesAdd);
+            case "remove":
+                const newFramesRmv = [...prevState];
+                newFramesRmv.shift();
+                return(newFramesRmv);
+            case "switch":
+                return(prevState);
+            default:
+                console.log("error: tab reducer has unknown command");
+                return(prevState);
+        }
+        
+    }; const [globalFrames, globalFrameDispatch] = useReducer(framesReducer, []);
+
+    // Tab State //
+    function tabsReducer(prevState: TabItem[], action:any): any{
+        switch(action.type) {
+            case 'add':
+                const newActiveKeyAdd = `tabNumber${newTabIndex.current++}`;
+                const newPanesAdd = [...prevState];    /*content insert below TODO */
+                newPanesAdd.push({ label: 'New Tab', children: <Content/>, key: newActiveKeyAdd, pageContext: initialPageContext });
+                setActiveKey(newActiveKeyAdd);
+                return newPanesAdd;
+
+            case 'remove':
+                let newActiveKeyRmv = activeKey;
+                let lastIndex = -1;
+                prevState.forEach((item: any, i: any) => {
+                    if (item.key === action.targetKey) {
+                        lastIndex = i - 1;
+                    }
+                });
+                const newPanesRmv = prevState.filter((item: any) => item.key !== action.targetKey);
+                if (newPanesRmv.length && newActiveKeyRmv === action.targetKey) {
+                    if (lastIndex >= 0) {
+                        newActiveKeyRmv = newPanesRmv[lastIndex].key;
+                    } else {
+                        newActiveKeyRmv = newPanesRmv[0].key;
+                    }
+                }
+                setActiveKey(newActiveKeyRmv);
+                console.log(newActiveKeyRmv);
+                console.log(action.targetKey);
+                return newPanesRmv;
+
+            case 'swap':
+                const fromIndex = prevState.findIndex(item => item.key === action.fromKey);
+                const toIndex = prevState.findIndex(item => item.key === action.toKey);
+                if (fromIndex === -1 || toIndex === -1) {
+                    console.log("error: element does not seem to exist when swapping tabs");
+                    return;
+                }
+                return arrayMove(prevState, fromIndex, toIndex);
+
+            case 'change':
+                return [prevState];
+            
+            case 'search':
+                return [prevState];
+
+            default: 
+                console.log("error: tab reducer has unknown command");
+                return [prevState];
+        }
+    }; const [tabs, tabsDispatch] = useReducer(tabsReducer, initialItems);
+    
+    // Stuff //
+    useEffect(() => { 
+        // Allows the entire black bar at the top of the page to be dragged //
         const navWrap = document.querySelector('.ant-tabs-nav-wrap');
         if (navWrap) {
-        navWrap.setAttribute('data-tauri-drag-region', '');
+            navWrap.setAttribute('data-tauri-drag-region', '');
         }
     }, []);
-
-    // Closes window if no tabs open //
     useEffect(() => {
-        if(items.length == 0){
+        // Closes window if no tabs open //
+        if(tabs.length == 0){
         const appWindow = getCurrentWindow();
         appWindow.close();
         };
     });
-
-    // Monitor for DnD //
     useEffect(() => {
+        // Monitor for DnD //
         return monitorForElements({
             onDrop({ source, location }) {
                 if(location.current.dropTargets.length <= 0 || location.current.dropTargets[0].data["typeOf"] != "drop_tab"){
@@ -63,63 +143,33 @@ const App: React.FC = () => {
                 const toKey = location.current.dropTargets[0].data["key"];
                 const isRightSide = location.current.dropTargets[0].data["isRightSide"];
                 
-                swapTabs(toKey as string, fromKey  as string, isRightSide as boolean);
+                // swapTabs(toKey as string, fromKey  as string, isRightSide as boolean);
+                tabsDispatch({type: "swap", toKey: toKey, fromKey: fromKey, isRightSide: isRightSide});
             },
         })
     });
     
-    const onChange = (newActiveKey: string) => {
+    // Handler Functions //
+    function handleOnChange(newActiveKey: string){
         setActiveKey(newActiveKey);
+        // if items.isMainFrame, activate frame view with key element
     };
-    const add = () => {
-        const newActiveKey = `tabNumber${newTabIndex.current++}`;
-        const newPanes = [...items];
-        newPanes.push({ label: 'New Tab', children: <Content/>, key: newActiveKey });
-        setItems(newPanes);
-        setActiveKey(newActiveKey);
-    };
-    const remove = (targetKey: TargetKey) => {
-        let newActiveKey = activeKey;
-        let lastIndex = -1;
-        items.forEach((item, i) => {
-        if (item.key === targetKey) {
-            lastIndex = i - 1;
-        }
-        });
-        const newPanes = items.filter((item) => item.key !== targetKey);
-        if (newPanes.length && newActiveKey === targetKey) {
-        if (lastIndex >= 0) {
-            newActiveKey = newPanes[lastIndex].key;
-        } else {
-            newActiveKey = newPanes[0].key;
-        }
-        }
-        setItems(newPanes);
-        setActiveKey(newActiveKey);
-    };
-    const onEdit = (
-        targetKey: React.MouseEvent | React.KeyboardEvent | string,
-        action: 'add' | 'remove',
-    ) => {
-        if (action === 'add') {
-        add();
-        } else {
-        remove(targetKey);
-        }
-    };
-    function swapTabs(toKey: string, fromKey: string, isRightSide: boolean) {
-        const fromIndex = items.findIndex(item => item.key === fromKey);
-        const toIndex = items.findIndex(item => item.key === toKey);
+    function handleOnEdit(targetKey: React.MouseEvent | React.KeyboardEvent | string, action: 'add' | 'remove'){
+        switch(action){
+            case 'add':
+                tabsDispatch({type: 'add' });
+                globalFrameDispatch({type: 'add'});
+                return;
+            case 'remove':
+                tabsDispatch({type: 'remove', targetKey: targetKey });
+                globalFrameDispatch({type: 'remove'});
+                return;
+            default:
+                console.log("error: on edit, unknown command");
+                return;
+    }};
 
-        if (fromIndex === -1 || toIndex === -1) {
-            console.log("error: element does not seem to exist when swapping tabs");
-            return;
-        }
-        setItems(arrayMove(items, fromIndex, toIndex));
-        console.log("huh")
-    }
-
-
+    // Render Stuff //
     const tabBarExtraContent = {
         left: (
             <div style={{marginRight: "15px", marginLeft: "10px"}}>
@@ -130,19 +180,18 @@ const App: React.FC = () => {
             <div style={{}}></div>
         ),
     };
-    
     return (
         <ConfigProvider theme={ antdThemeConfig }>
             <Tabs
-                type="editable-card"
-                destroyOnHidden={false} 
-                onChange={onChange}
-                activeKey={activeKey}
-                onEdit={onEdit}
-                items={items}
-                size={"small"}
-                animated
                 className="navigation-tabs"
+                type="editable-card"
+                size={"small"}
+                onChange={handleOnChange}
+                onEdit={handleOnEdit}
+                destroyOnHidden={false} 
+                activeKey={activeKey}
+                animated={false}
+                items={tabs}
                 tabBarExtraContent={tabBarExtraContent}
                 renderTabBar={(tabBarProps, DefaultTabBar) => (
                     <DefaultTabBar {...tabBarProps}>
@@ -150,8 +199,8 @@ const App: React.FC = () => {
                             <DragContext.Provider value={{ isDraggingTab, setIsDraggingTab }}>
                             <TabCard 
                                 node={node}
-                                swapTabs={swapTabs}
-                                onChange={onChange}
+                                onChange={handleOnChange}
+                                onEdit={handleOnEdit}
                                 {...tabBarProps}
                             />
                             </DragContext.Provider>
@@ -159,6 +208,7 @@ const App: React.FC = () => {
                     </DefaultTabBar>
                 )}
             />
+            <GlobalFrameRenderer activeKey={activeKey} globalFrames={globalFrames} globalFrameDispatch={globalFrameDispatch}/>
         </ConfigProvider>
     );
 };
