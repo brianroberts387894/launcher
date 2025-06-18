@@ -6,10 +6,12 @@ import { searchButtonTheme } from "../../config/themeConfig"
 // SEARCH PROGRAM VIEW (OPENS ON NEW TAB) //
 
 interface SearchPageProps {
-  setContentState: React.Dispatch<React.SetStateAction<TabType>>;
-  setTarget: React.Dispatch<React.SetStateAction<string>>;
+  setContentState: React.Dispatch<React.SetStateAction<TabType>>,
+  setTarget: React.Dispatch<React.SetStateAction<string>>,
+  onSearch: (key: string, target: string) => void,
+  assignedKey: string, 
 }
-const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarget }) => {
+const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarget, onSearch, assignedKey }) => {
   const [inputValue, setInputValue] = useState("");
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -25,7 +27,8 @@ const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarget }) =
       return;
     }    
     setTarget(inputValue);
-    setContentState(TabType.MAIN_WINDOW);
+    onSearch(assignedKey ,inputValue)
+    setContentState(TabType.FRAME_WINDOW);
   }  
 
   return(
@@ -35,6 +38,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ setContentState, setTarget }) =
         <Input
           size="large" 
           placeholder="Enter Program IP Address or Localhost Port" 
+          
           onChange={handleInputChange}
           onPressEnter={() => handleSubmission(inputValue)}
         />

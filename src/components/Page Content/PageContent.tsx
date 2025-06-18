@@ -1,26 +1,32 @@
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useEffect } from 'react';
 import SearchPage from "./SearchPage"
 import { TabType } from "../../types/TabContentTypes"
 
 interface ContentProps{
+    onSearch: (key: string, target: string) => void,
+    assignedKey: string,
 }
-function Content({}: ContentProps){
+function Content({onSearch, assignedKey}: ContentProps){
+    // TODO - Redo this part
+    const [contentDisplayed, setContentDisplayed] = useState(<div/>)
     const [contentState, setContentState] = useState(TabType.SEARCH_PAGE);
     const [target, setTarget] = useState("");
 
-    let content_displayed;
-    switch(contentState){
+    useEffect(() => {
+         switch(contentState){
         case TabType.SEARCH_PAGE:
-            content_displayed = <SearchPage setContentState={setContentState} setTarget={setTarget}/>;
+            setContentDisplayed(<SearchPage onSearch={onSearch} assignedKey={assignedKey} setContentState={setContentState} setTarget={setTarget}/>);
             break;
         default:
-            content_displayed = <div/>
+            setContentDisplayed(<div/>);
             break;
     }
+    }, [contentState]);
+   
     
     return( 
         <div className="content-tab-container" > 
-            { content_displayed }
+            { contentDisplayed }
         </div>  
     )
 }

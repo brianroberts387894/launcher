@@ -10,16 +10,19 @@ import { TabType } from "../../types/TabContentTypes"
 import { arrayMove } from '@dnd-kit/sortable';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 
-
-type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 type TabItem = {
     label: string;
     children: React.ReactNode;
     key: string;
     pageContext: any; // You can replace `any` with a more specific type if you know it
 };
+type Frame = {
+  display: string;
+  target: string;
+  key: string;
+}
 
-// TAB - IRREVELANT CONTEXT, MIGRATE TO TAB.TSX // 
+// TAB - IRREVELANT CONTEXT, MIGRATE TO TAB.TSX - TODO // 
 interface DragContextType {
     isDraggingTab: boolean;
     setIsDraggingTab: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,7 +40,7 @@ const App: React.FC = () => {
         type: TabType.SEARCH_PAGE, target: ""
     };
     const initialItems = [
-        { label: 'Silly Tab', children: <Content/>, key: initialKey, pageContext: initialPageContext},
+        { label: 'Silly Tab', children: <Content onSearch={handleOnSearch} assignedKey={initialKey}/>, key: initialKey, pageContext: initialPageContext},
     ];
 
     // State //
@@ -46,20 +49,22 @@ const App: React.FC = () => {
     const [isDraggingTab, setIsDraggingTab] = useState<boolean>(false);
 
     // Controls Iframe View //
-    function framesReducer(prevState: any, action: any){
+    function framesReducer(prevState: Frame[], action: any){
         switch(action.type){
             case "add": 
                 const newFramesAdd = [...prevState];
-                newFramesAdd.push("https://www.react.dev");
+                // console.log(action.key);
+                newFramesAdd.push({display: "none", target: action.target, key: action.key});
                 return(newFramesAdd);
             case "remove":
-                const newFramesRmv = [...prevState];
-                newFramesRmv.shift();
+                const newFramesRmv = prevState.filter(item => item.key !== action.key);
+                console.log(newFramesRmv);
                 return(newFramesRmv);
             case "switch":
-                return(prevState);
+                const newFramesSwt = prevState.map(item => ({ ...item, display: item.key === activeKey ? "block" : "none", }));
+                return(newFramesSwt);
             default:
-                console.log("error: tab reducer has unknown command");
+                console.log("error: frame reducer has unknown command");
                 return(prevState);
         }
         
@@ -71,7 +76,7 @@ const App: React.FC = () => {
             case 'add':
                 const newActiveKeyAdd = `tabNumber${newTabIndex.current++}`;
                 const newPanesAdd = [...prevState];    /*content insert below TODO */
-                newPanesAdd.push({ label: 'New Tab', children: <Content/>, key: newActiveKeyAdd, pageContext: initialPageContext });
+                newPanesAdd.push({ label: 'New Tab', children: <Content onSearch={handleOnSearch} assignedKey={newActiveKeyAdd}/>, key: newActiveKeyAdd, pageContext: initialPageContext });
                 setActiveKey(newActiveKeyAdd);
                 return newPanesAdd;
 
@@ -92,8 +97,6 @@ const App: React.FC = () => {
                     }
                 }
                 setActiveKey(newActiveKeyRmv);
-                console.log(newActiveKeyRmv);
-                console.log(action.targetKey);
                 return newPanesRmv;
 
             case 'swap':
@@ -148,26 +151,33 @@ const App: React.FC = () => {
             },
         })
     });
+    useEffect(() => {
+        globalFrameDispatch({ type: "switch", key: activeKey });
+    }, [activeKey]);
     
     // Handler Functions //
-    function handleOnChange(newActiveKey: string){
+    function handleOnClick(newActiveKey: string){
         setActiveKey(newActiveKey);
-        // if items.isMainFrame, activate frame view with key element
+        globalFrameDispatch({type: "switch", key: activeKey});
     };
-    function handleOnEdit(targetKey: React.MouseEvent | React.KeyboardEvent | string, action: 'add' | 'remove'){
+    function handleOnEdit(key: React.MouseEvent | React.KeyboardEvent | string, action: 'add' | 'remove'){
         switch(action){
             case 'add':
                 tabsDispatch({type: 'add' });
-                globalFrameDispatch({type: 'add'});
                 return;
             case 'remove':
-                tabsDispatch({type: 'remove', targetKey: targetKey });
-                globalFrameDispatch({type: 'remove'});
+                tabsDispatch({type: 'remove', targetKey: key });
+                globalFrameDispatch({type: 'remove', key: key});
                 return;
             default:
-                console.log("error: on edit, unknown command");
+                console.log("error: onEdit has unknown command");
                 return;
     }};
+    function handleOnSearch(key: string, target: string){
+        globalFrameDispatch({type: "add", key: key, target: target});
+        globalFrameDispatch({ type: "switch", key: key });
+        return;
+    }
 
     // Render Stuff //
     const tabBarExtraContent = {
@@ -182,11 +192,12 @@ const App: React.FC = () => {
     };
     return (
         <ConfigProvider theme={ antdThemeConfig }>
+            <GlobalFrameRenderer activeKey={activeKey} globalFrames={globalFrames} globalFrameDispatch={globalFrameDispatch}/>
             <Tabs
                 className="navigation-tabs"
                 type="editable-card"
                 size={"small"}
-                onChange={handleOnChange}
+                onChange={handleOnClick}
                 onEdit={handleOnEdit}
                 destroyOnHidden={false} 
                 activeKey={activeKey}
@@ -199,7 +210,7 @@ const App: React.FC = () => {
                             <DragContext.Provider value={{ isDraggingTab, setIsDraggingTab }}>
                             <TabCard 
                                 node={node}
-                                onChange={handleOnChange}
+                                onChange={handleOnClick}
                                 onEdit={handleOnEdit}
                                 {...tabBarProps}
                             />
@@ -208,7 +219,7 @@ const App: React.FC = () => {
                     </DefaultTabBar>
                 )}
             />
-            <GlobalFrameRenderer activeKey={activeKey} globalFrames={globalFrames} globalFrameDispatch={globalFrameDispatch}/>
+            
         </ConfigProvider>
     );
 };

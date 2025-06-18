@@ -11,14 +11,15 @@ import React, { useEffect, useRef, useState, createContext } from 'react';
 //     setIsDraggingTab: () => {},
 // });
 
-let frames = [
-    <iframe src= "https://www.react.dev"/>,
-    <iframe src= "https://www.google.com"/>,
-]
+type Frame = {
+  display: string;
+  target: string;
+  key: string;
+}
 
 type FrameRendererProps = {
     activeKey: string,
-    globalFrames: string[],
+    globalFrames: Frame[],
     globalFrameDispatch: React.Dispatch<any>
 }
 function App({activeKey, globalFrames, globalFrameDispatch}: FrameRendererProps){
@@ -26,11 +27,11 @@ function App({activeKey, globalFrames, globalFrameDispatch}: FrameRendererProps)
     useEffect(() => {
         
     },[activeKey, globalFrames]);
-
-    const listItems = globalFrames.map(frame => <iframe src={frame as string} />);
+    
+    const listItems = globalFrames.map(frame => <iframe key={frame.key} style={{height: "calc(100vh - 55px)", width: "100vw", display: frame.display}} src={frame.target as string} />);
     return(
         <div
-            style={{zIndex: "1000", position: "fixed"}}
+            style={{zIndex: "1000", position: "fixed", bottom: "0"}}
         >
             {listItems}
         </div>
